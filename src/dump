@@ -1,0 +1,68 @@
+
+def Major(baseNote):
+    return (baseNote.upper(), [4, 3], baseNote)
+
+def Minor(baseNote):
+    return (baseNote.upper() + "m", [3, 4], baseNote)
+
+def Diminished(baseNote):
+    return (baseNote.upper() + "dim", [3, 3], baseNote)
+
+def Augmented(baseNote):
+    return (baseNote.upper() + "aug", [4, 4], baseNote)
+
+def SustainedTriplet(baseNote, value :int):
+    if value == 2:
+        return (baseNote.upper() + "sus2", [2, 5], baseNote)
+    elif value == 4:
+        return (baseNote.upper() + "sus4", [5, 2], baseNote)
+    else:
+        raise Exception("Sustained base triplet can only be 2 or 4 valued!")
+    
+    
+class CMajorOld(Key):
+    def __init__(self, notes):
+        super().__init__(notes, "c", NoteType.NATURAL, KeyType.MAJOR)
+
+        self.chords = {
+            1 : [Major("c"), Major("g"), Major("f")],
+            2 : [Minor("d"), Minor("e"), Minor("b"), Minor("a")],
+            3 : [Minor("c"), Minor("g"), Minor("f"), Major("d"), Major("e"), Major("b"), Major("a")],
+            4 : []
+        }
+
+# Chord = (name :str, )
+    def getRandomChord(self, difficultyFrom : int, difficultyTo: int) -> Chord:
+        difficulty = random.randint(difficultyFrom, difficultyTo)
+        chord = random.choice(self.chords[difficulty])
+        name = chord[0]
+        steps = chord[1]
+        baseNote = chord[2]
+
+        return Chord(name, self.buildChord(baseNote, steps), baseNote)
+    
+    def getNotes(self):
+        if self.keyType == KeyType.MAJOR:
+            return self.getNotesWithRule([2, 2, 1, 2, 2, 2])
+        if self.keyType == KeyType.MINOR:
+            return self.getNotesWithRule([2, 1, 2, 2, 1, 2])
+
+    def getNotesWithRule(self, rule : list): # rule list contains steps as half steps on the keys
+        if self.keyType == KeyType.MAJOR:
+            if self.noteType == NoteType.NATURAL:
+                return self.takeNotesWithSteps(self.allNotes, rule)
+
+    def takeNotesWithSteps(self, notes : list, steps : list):
+        baseIndex = notes.index(self.baseNote)
+        maxIndex = len(notes) - 1
+        result = [self.baseNote]
+        index = baseIndex
+
+        for step in steps:
+            index += step
+            if index > maxIndex:
+                index -= (maxIndex + 1)
+            
+            result.append(notes[index])
+        
+        return result
