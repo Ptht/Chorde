@@ -19,17 +19,17 @@ if not pygame.midi.get_init():
     raise Exception("Could not init midi module!")
 
 vec = pygame.math.Vector2  # 2 for two dimensional
-chordFont = pygame.font.Font("seguisym.ttf", 30)
-endFont = pygame.font.Font("seguisym.ttf", 60)
+chordFont = pygame.font.Font("./src/seguisym.ttf", 30)
+endFont = pygame.font.Font("./src/seguisym.ttf", 60)
  
-HEIGHT = 800
+HEIGHT = 750
 WIDTH = 1200
 BOTTOMHEIGHT = 80
 TOPHEIGHT = 60
 FPSCAP = 60
 DIFFICULTYMULTIPLIER = 15
 CHORDTIMEBASE = 3000
-MAXSPEED = 120
+MAXSPEED = 110
 MINCHORDTIME = 2000
  
 display = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -115,7 +115,7 @@ while True:
     chordTimer += deltaT
     if chordTimer >= chordTime:
         newChord = cMajor.getRandomChord(1, difficulty)
-        speed = int(40 + (1/newChord.difficulty) * score * 0.5)
+        speed = int(40 + (1/newChord.difficulty) * score)
         if speed > MAXSPEED:
             speed = MAXSPEED
         newChord.init((random.randint(20, WIDTH - 40), TOPHEIGHT - 20), speed)

@@ -22,6 +22,9 @@ class ChordBuilder():
         self.flatNotation = "♭"
         self.sharpNotation = "#"
 
+    def equals(self, other :ChordBuilder) -> bool:
+        return self.baseNote == other.baseNote and self.steps == other.steps
+
     # new base note
     def slash(self, note :str):
         pass
@@ -38,11 +41,19 @@ class ChordBuilder():
         self.steps[1] += 1
         self.text += self.sharpNotation + "5"
 
+    def sixth(self):
+        self.steps.append(9)
+        self.text += "6"
+    
+    def flat6(self):
+        self.steps.append(8)
+        self.text += "-6"
+
     def half7(self) -> ChordBuilder:
         if self.type != ChordType.DIM:
             raise Exception("Only Diminished base chord can have Half seven!")
         self.steps.append(10)
-        self.text += "⌀7"
+        self.text = self.text.removesuffix("dim") +"⌀7"
         return self
 
     def dom7(self) -> ChordBuilder:

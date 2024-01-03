@@ -23,6 +23,18 @@ class Key():
         self.notes = self.getNotes()
         self.chords : dict[int, list[ChordBuilder]] = {}
 
+    def checkDuplicates(self):
+        for dif in self.chords.items():
+            for i in range(0, len(dif[1])):
+                chord = dif[1][i]
+                for innerDif in self.chords.items():
+                    for j in range(0, len(innerDif[1])):
+                        if dif[0] == innerDif[0] and i == j: #looking at the same chord
+                            continue
+                        innedChord = innerDif[1][j]
+                        if chord.equals(innedChord):
+                            raise Exception(f"Chords '{chord.text}({dif[0]})' and '{innedChord.text}'({innerDif[0]}) are the same!")
+
     # Chord = (name :str, )
     def getRandomChord(self, difficultyFrom : int, difficultyTo: int) -> Chord:
         difficulty = random.randint(difficultyFrom, difficultyTo)

@@ -164,7 +164,7 @@ def process(stopped :threading.Event, queue :Queue[np.ndarray], result :Queue[in
         pair = amplSortedPairs[-1]
 
         if (pair[1] > 150):
-            print(f"top freq: {pair[1]} - {noteFinder.getNote(pair[0])}, ({noteFinder.getNote(amplSortedPairs[-2][0])}, {noteFinder.getNote(amplSortedPairs[-3][0])})" )
+            print(f"top freq: {pair[0]} - {noteFinder.getNote(pair[0])}, ({noteFinder.getNote(amplSortedPairs[-2][0])}, {noteFinder.getNote(amplSortedPairs[-3][0])})" )
     
     try:
         result.put((time.time_ns, fftResult.tolist()))
