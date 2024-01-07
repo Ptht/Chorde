@@ -159,12 +159,14 @@ def process(stopped :threading.Event, queue :Queue[np.ndarray], result :Queue[in
             pass
 
         amplSortedPairs = sorted(pairs, key=lambda x: x[1])
-        top5 = amplSortedPairs[-10:]
-
-        pair = amplSortedPairs[-1]
+            pair = amplSortedPairs[-1]
 
         if (pair[1] > 150):
-            print(f"top freq: {pair[0]} - {noteFinder.getNote(pair[0])}, ({noteFinder.getNote(amplSortedPairs[-2][0])}, {noteFinder.getNote(amplSortedPairs[-3][0])})" )
+            top = amplSortedPairs[-10:]
+
+            topNotes = [x[0] for x in (noteFinder.getNote(f[0]) for f in top) if x is not None]
+            print(f"top freq: {pair[0]} - {noteFinder.getNote(pair[0])}, - {topNotes}")
+                  #({noteFinder.getNote(amplSortedPairs[-2][0])}, {noteFinder.getNote(amplSortedPairs[-3][0])})" )
     
     try:
         result.put((time.time_ns, fftResult.tolist()))
