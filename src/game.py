@@ -27,10 +27,11 @@ WIDTH = 1200
 BOTTOMHEIGHT = 80
 TOPHEIGHT = 60
 FPSCAP = 60
-DIFFICULTYMULTIPLIER = 15
+DIFFICULTYDIFFERENCE = 10
+DIFFICULTYMULTIPLIER = 1.1
 CHORDTIMEBASE = 3000
 MAXSPEED = 110
-MINCHORDTIME = 2000
+MINCHORDTIME = 2500
  
 display = pygame.display.set_mode((WIDTH, HEIGHT))
 displayRect = display.get_rect()
@@ -42,8 +43,9 @@ midiInput = pygame.midi.Input(midiInputId)
 
 keyboard = init.initKeyBoard(midiInput, display, chordFont)
 
-baseDifficulty = init.initDifficulty(display, chordFont)
-difficulty = baseDifficulty
+startingDifficulty = init.initDifficulty(display, chordFont)
+difficulty = startingDifficulty
+rawDifficulty = startingDifficulty
 
 helpers.printDeviceInfos()
 
@@ -76,7 +78,10 @@ while True:
     deltaT = clock.tick(FPSCAP)
     display.fill((0,0,0))
 
-    difficulty = int(score / DIFFICULTYMULTIPLIER) + baseDifficulty
+    requiredScore = DIFFICULTYDIFFERENCE * difficulty * (DIFFICULTYMULTIPLIER**difficulty)
+    if score >= requiredScore:
+        difficulty += 1
+    #difficulty = int(score / DIFFICULTYDIFFERENCE) + startingDifficulty
 
     bottomLineStart = (0, displayRect.height - BOTTOMHEIGHT)
     bottomLineEnd = (displayRect.width, displayRect.height - BOTTOMHEIGHT)
@@ -106,24 +111,27 @@ while True:
     display.blit(difficultyDisplay, bottomRight)
 
     #noteTimer += deltaT
-    if noteTimer >= noteTime:
-        newNote = Note(random.choice(notes), random.randint(30, WIDTH - 30))
-        activeNotes.append(newNote)
-        noteTimer = 0
+    #if noteTimer >= noteTime:
+    #    newNote = Note(random.choice(notes), random.randint(30, WIDTH - 30))
+    #    activeNotes.append(newNote)
+    #    noteTimer = 0
 
     # Add a chord that needs playing if timer is up
     chordTimer += deltaT
     if chordTimer >= chordTime:
-        newChord = cMajor.getRandomChord(1, difficulty)
+        newChord = cMajor.getAdjustedRandomChord(1, difficulty)
         speed = int(40 + (1/newChord.difficulty) * score)
         if speed > MAXSPEED:
             speed = MAXSPEED
-        newChord.init((random.randint(20, WIDTH - 40), TOPHEIGHT - 20), speed)
+        newChord.init((random.randint(10, WIDTH - 80), TOPHEIGHT - 20), speed)
         #print("adding", newChord.text)
 
         activeChords.append(newChord)
-        if chordTime > MINCHORDTIME:
-            chordTime -= score * 3
+
+        if difficulty >= cMajor.getMaxDifficulty():
+            chordTime -= int(score/30)
+        elif chordTime > MINCHORDTIME:
+            chordTime -= int(score)
         chordTimer = 0
 
     helpers.tranformMidi2Events(midiInput)
@@ -161,9 +169,10 @@ while True:
             if pyGameHelpers.waitForR():
                 keyboard.clear()
                 activeChords.clear()
+                difficulty = startingDifficulty
                 score = 0
                 chordTime = CHORDTIMEBASE
-                chordTimer = chordTime
+                chordTimer = 0
                 clock.tick(FPSCAP)
             else:
                 print("quit!")

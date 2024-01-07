@@ -19,6 +19,7 @@ class Key():
         self.keyType = keyType
         self.noteType = noteType
         self.allNotes = notes
+        self.playCounts : dict[int, dict[str, int]] = {}
         
         self.notes = self.getNotes()
         self.chords : dict[int, list[ChordBuilder]] = {}
@@ -27,6 +28,8 @@ class Key():
         for dif in self.chords.items():
             for i in range(0, len(dif[1])):
                 chord = dif[1][i]
+                self.playCounts[chord.text] = 0
+                
                 for innerDif in self.chords.items():
                     for j in range(0, len(innerDif[1])):
                         if dif[0] == innerDif[0] and i == j: #looking at the same chord
@@ -34,6 +37,45 @@ class Key():
                         innedChord = innerDif[1][j]
                         if chord.equals(innedChord):
                             raise Exception(f"Chords '{chord.text}({dif[0]})' and '{innedChord.text}'({innerDif[0]}) are the same!")
+
+    def getMaxDifficulty(self) -> int:
+        return len(self.chords)
+
+    def getAdjustedRandomChord(self, difficultyFrom : int, difficultyTo: int) -> Chord:
+        difficulty = random.randint(difficultyFrom, difficultyTo)
+
+        if len(self.chords) <= difficulty:
+            difficulty = len(self.chords)
+
+        minCount = min(self.playCounts.keys())
+        if minCount < max(self.playCounts.keys()) - 1:
+            chordName = [x for x in self.playCounts if x[0] == minCount][0]
+            chord = self.getChord(chordName)
+        else:
+            chord = random.choice(self.chords[difficulty])            
+
+        name = chord.text
+        steps = chord.steps
+        baseNote = chord.baseNote
+        
+        self.playCounts[name] += 1
+
+        return Chord(name, self.buildChord(baseNote, steps), baseNote, difficulty)
+
+    def getMinPlayCount(self, maxDif :int) -> ChordBuilder:
+        min = 999
+        for i in range(1, maxDif):
+            counts = self.playCounts[i]
+            for x in counts:
+                if x[1] < min:
+                    min = x[1]
+
+
+    def getChord(self, name :str) -> ChordBuilder:
+        for dif in self.chords.values():
+            for chord in dif:
+                if chord.text == name:
+                    return chord
 
     # Chord = (name :str, )
     def getRandomChord(self, difficultyFrom : int, difficultyTo: int) -> Chord:

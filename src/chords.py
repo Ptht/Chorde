@@ -17,6 +17,7 @@ class ChordBuilder():
         self.steps = baseSteps
         self.key = None
         self.type = type
+        self.playCount = 0
 
         self.major = "maj"
         self.flatNotation = "♭"

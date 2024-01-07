@@ -26,7 +26,7 @@ def initDifficulty(display :Surface, font :font.Font) -> int:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
-                    if difficulty < 3:
+                    if difficulty < 5:
                         difficulty += 1
                 elif event.key == pygame.K_LEFT:
                     if difficulty > 1:
