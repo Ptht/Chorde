@@ -36,14 +36,15 @@ def anyKey():
         elif event.type == pygame.KEYDOWN:
             return
 
-def waitForR() -> bool:
+# False if something else pressed
+def waitForKey(key :int) -> bool:
     pygame.event.clear()
     while True:
         event = pygame.event.wait()
         if event.type == pygame.QUIT:
             return
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_r:
+            if event.key == key:
                 return True
             else:
                 return False

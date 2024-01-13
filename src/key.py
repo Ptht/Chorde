@@ -26,10 +26,11 @@ class Key():
 
     def checkDuplicates(self):
         for dif in self.chords.items():
+            self.playCounts[dif[0]] = {}
             for i in range(0, len(dif[1])):
                 chord = dif[1][i]
-                self.playCounts[chord.text] = 0
-                
+                self.playCounts[dif[0]][chord.text] = 0
+
                 for innerDif in self.chords.items():
                     for j in range(0, len(innerDif[1])):
                         if dif[0] == innerDif[0] and i == j: #looking at the same chord
@@ -42,34 +43,54 @@ class Key():
         return len(self.chords)
 
     def getAdjustedRandomChord(self, difficultyFrom : int, difficultyTo: int) -> Chord:
-        difficulty = random.randint(difficultyFrom, difficultyTo)
+        maxDif = difficultyTo
+        if len(self.chords) <= maxDif:
+            maxDif = len(self.chords)
 
-        if len(self.chords) <= difficulty:
-            difficulty = len(self.chords)
+        difficulty = random.randint(difficultyFrom, maxDif)
 
-        minCount = min(self.playCounts.keys())
-        if minCount < max(self.playCounts.keys()) - 1:
-            chordName = [x for x in self.playCounts if x[0] == minCount][0]
+        minCount = self.getMinPlayCount(maxDif)
+        maxCount = self.getMaxPlayCount(maxDif)
+
+        if minCount < maxCount - 1:
+            chordName, chosenDif = self.getChordWithCount(maxDif, minCount)
             chord = self.getChord(chordName)
         else:
-            chord = random.choice(self.chords[difficulty])            
+            chord = random.choice(self.chords[difficulty])
+            chosenDif = difficulty
 
         name = chord.text
         steps = chord.steps
         baseNote = chord.baseNote
         
-        self.playCounts[name] += 1
+        self.playCounts[chosenDif][name] += 1
 
         return Chord(name, self.buildChord(baseNote, steps), baseNote, difficulty)
 
+    def getChordWithCount(self, maxDif :int, count :int) -> (str, int):
+        for i in range(1, maxDif + 1):
+            counts = self.playCounts[i]
+            for note, noteCount in counts.items():
+                if noteCount == count:
+                    return (note, i)
+
     def getMinPlayCount(self, maxDif :int) -> ChordBuilder:
         min = 999
-        for i in range(1, maxDif):
+        for i in range(1, maxDif + 1):
             counts = self.playCounts[i]
-            for x in counts:
-                if x[1] < min:
-                    min = x[1]
+            for count in counts.values():
+                if count < min:
+                    min = count
+        return min
 
+    def getMaxPlayCount(self, maxDif :int):
+        max = 0
+        for i in range(1, maxDif + 1):
+            counts = self.playCounts[i]
+            for count in counts.values():
+                if count > max:
+                    max = count
+        return max
 
     def getChord(self, name :str) -> ChordBuilder:
         for dif in self.chords.values():

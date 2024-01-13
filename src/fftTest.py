@@ -159,10 +159,10 @@ def process(stopped :threading.Event, queue :Queue[np.ndarray], result :Queue[in
             pass
 
         amplSortedPairs = sorted(pairs, key=lambda x: x[1])
-            pair = amplSortedPairs[-1]
+        pair = amplSortedPairs[-1]
 
         if (pair[1] > 150):
-            top = amplSortedPairs[-10:]
+            top = amplSortedPairs[-16:]
 
             topNotes = [x[0] for x in (noteFinder.getNote(f[0]) for f in top) if x is not None]
             print(f"top freq: {pair[0]} - {noteFinder.getNote(pair[0])}, - {topNotes}")
